@@ -123,6 +123,8 @@
 html {
     scroll-behavior: smooth;
     font-size: 16.5px;
+    background-color: var(--paper);
+    color: var(--ink);
 }
 
 body {

@@ -1,46 +1,5 @@
-// ===== Theme switching =====
-// Pre-paint application of the saved/preferred theme happens via an inline
-// snippet in each page's <head> to avoid a flash. This script keeps the
-// switcher buttons in sync and persists user choice.
-
-const THEME_KEY = 'profile-theme';
-const THEMES = ['cream', 'snow', 'dark'];
-
-function currentTheme() {
-    const attr = document.documentElement.dataset.theme;
-    return THEMES.includes(attr) ? attr : 'cream';
-}
-
-function applyTheme(name, { persist = true } = {}) {
-    if (!THEMES.includes(name)) return;
-    document.documentElement.dataset.theme = name;
-    if (persist) {
-        try { localStorage.setItem(THEME_KEY, name); } catch (e) { /* ignore */ }
-    }
-    document.querySelectorAll('[data-theme-set]').forEach((btn) => {
-        const isActive = btn.dataset.themeSet === name;
-        btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-pressed', String(isActive));
-    });
-}
-
-document.querySelectorAll('[data-theme-set]').forEach((btn) => {
-    btn.addEventListener('click', () => applyTheme(btn.dataset.themeSet));
-});
-
-// Sync active state to whatever was set before this script ran.
-applyTheme(currentTheme(), { persist: false });
-
-// Follow system preference changes when the user hasn't explicitly chosen.
-const mq = window.matchMedia('(prefers-color-scheme: dark)');
-const onSystemChange = (e) => {
-    try {
-        if (localStorage.getItem(THEME_KEY)) return; // user override wins
-    } catch (err) { /* ignore */ }
-    applyTheme(e.matches ? 'dark' : 'cream', { persist: false });
-};
-if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onSystemChange);
-else if (typeof mq.addListener === 'function') mq.addListener(onSystemChange);
+// Note: theme switching is handled entirely by assets/js/theme.js,
+// which is loaded synchronously in <head> so it runs before paint.
 
 // ===== Sticky nav shadow on scroll =====
 const nav = document.querySelector('.nav');

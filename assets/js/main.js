@@ -15,8 +15,7 @@ const navLinks = document.querySelector('.nav-links');
 if (navToggle && navLinks) {
     navToggle.addEventListener('click', () => {
         navLinks.classList.toggle('open');
-        const expanded = navLinks.classList.contains('open');
-        navToggle.setAttribute('aria-expanded', String(expanded));
+        navToggle.setAttribute('aria-expanded', String(navLinks.classList.contains('open')));
     });
     navLinks.querySelectorAll('a').forEach((a) => {
         a.addEventListener('click', () => navLinks.classList.remove('open'));
@@ -33,27 +32,26 @@ if (revealItems.length && 'IntersectionObserver' in window) {
                 io.unobserve(entry.target);
             }
         });
-    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
     revealItems.forEach((el) => io.observe(el));
 } else {
     revealItems.forEach((el) => el.classList.add('visible'));
 }
 
 // Animated counters on stats
-const counters = document.querySelectorAll('.stat-num[data-target]');
+const counters = document.querySelectorAll('[data-target]');
 if (counters.length && 'IntersectionObserver' in window) {
     const animate = (el) => {
         const target = parseInt(el.dataset.target, 10);
-        const plus = el.dataset.plus === 'true';
-        const suffix = plus ? '+' : '';
+        if (Number.isNaN(target)) return;
         const duration = 1400;
         const start = performance.now();
         const step = (now) => {
             const t = Math.min((now - start) / duration, 1);
             const eased = 1 - Math.pow(1 - t, 3);
-            const value = Math.floor(target * eased);
-            el.textContent = value + (t === 1 ? suffix : '');
+            el.textContent = Math.floor(target * eased);
             if (t < 1) requestAnimationFrame(step);
+            else el.textContent = target;
         };
         requestAnimationFrame(step);
     };
@@ -69,5 +67,6 @@ if (counters.length && 'IntersectionObserver' in window) {
 }
 
 // Footer year
-const yearSlot = document.querySelector('[data-year]');
-if (yearSlot) yearSlot.textContent = new Date().getFullYear();
+document.querySelectorAll('[data-year]').forEach((el) => {
+    el.textContent = String(new Date().getFullYear());
+});
